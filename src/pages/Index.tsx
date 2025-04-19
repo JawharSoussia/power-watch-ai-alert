@@ -12,6 +12,38 @@ import Footer from '../components/Footer';
 // Import Map component with lazy loading
 const Map = lazy(() => import('../components/Map'));
 
+// Simple error boundary component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="py-20 text-center">
+          <h3 className="text-xl font-medium mb-4">Something went wrong with the map.</h3>
+          <button
+            onClick={() => this.setState({ hasError: false })}
+            className="px-4 py-2 bg-electric-500 text-white rounded-md"
+          >
+            Try again
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const Index = () => {
   const [isBrowser, setIsBrowser] = useState(false);
   
@@ -28,9 +60,11 @@ const Index = () => {
       
       {/* Conditionally render Map component only in browser environment */}
       {isBrowser && (
-        <Suspense fallback={<div className="py-20 text-center">Loading map...</div>}>
-          <Map />
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<div className="py-20 text-center">Loading map...</div>}>
+            <Map />
+          </Suspense>
+        </ErrorBoundary>
       )}
       
       <Benefits />

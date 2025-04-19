@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -34,19 +34,13 @@ const getStatusColor = (status: string) => {
   }
 };
 
-// Fix Leaflet icon issues
-// This needs to be done before any MapContainer is rendered
-// Delete default icon and use custom URLs
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+// Fix Leaflet icon issues by setting up icon paths properly
+// Use a safer approach that doesn't depend on _getIconUrl
+if (typeof window !== 'undefined') {
+  L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/';
+}
 
 const Map: React.FC = () => {
-  // We no longer need the useEffect that was using require()
-  
   return (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
